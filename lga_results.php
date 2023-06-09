@@ -78,7 +78,7 @@ include "config.php";
                     <div class="w-full text-xl text-center pb-4">
                         Check Local Govt. Results
                     </div>
-                    
+
                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
@@ -100,9 +100,11 @@ include "config.php";
                                     ?>
                                 </select>
                             </div>
-                            <a href="#" class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                                <div id="resps" class="font-normal text-gray-700 dark:text-gray-400"></div>
-                            </a>
+                            <p class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                                <a id="resps" class="font-normal text-gray-700 dark:text-gray-400">
+
+                                </a>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -128,7 +130,9 @@ $(document).ready(function () {
 		url: "checklga.php",
 		data: formData,
 	}).done(function(data) {
+        
 		$("#resps").html(data);
+
 	});
 	});
 
