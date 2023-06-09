@@ -53,34 +53,51 @@ include "config.php";
                         Check Local Govt. Results
                     </div>
 
-                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
+                    <form id="addform" method="post" class="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="lga" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Local Govt.</label>
-                                <select id="lga" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                    <option>--- Select Local Govt ---</option>
+                                <label for="polling_unit" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Polling Unit</label>
+                                <select id="polling_unit" name="polling_unit" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option value="">--- Select Pollint Unit ---</option>
                                     <?php
-                                    $lga = "SELECT * FROM lga WHERE state_id = '25'";
-                                    $r = $conn->query($lga);
-                                    if ($r->num_rows > 0) {
-                                        while($me = $r->fetch_assoc()) {
-                                            $lga_id = $me["lga_id"];
-                                            $lga_name = $me["lga_name"];
+                                    $pu = "SELECT * FROM polling_unit";
+                                    $re = $conn->query($pu);
+                                    if ($re->num_rows > 0) {
+                                        while($mee = $re->fetch_assoc()) {
+                                            $uniqueid = $mee["uniqueid"];
+                                            $pu_name = $mee["polling_unit_name"];
                                     ?>
-                                        <option value="<?php echo $lga_id ?>"><?php echo $lga_name ?></option>
+                                        <option value="<?php echo $uniqueid ?>"><?php echo $pu_name ?></option>
                                     <?php
                                         }
                                     }
                                     ?>
                                 </select>
                             </div>
-                            <p class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                                <a id="resps" class="font-normal text-gray-700 dark:text-gray-400">
-
-                                </a>
-                            </p>
+                            <div>
+                                <label for="party" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Polling Unit</label>
+                                <select id="party" name="party" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option value="">--- Select Party ---</option>
+                                    <?php
+                                    $party = "SELECT * FROM party";
+                                    $r = $conn->query($party);
+                                    if ($r->num_rows > 0) {
+                                        while($me = $r->fetch_assoc()) {
+                                            $party_id = $me["partyid"];
+                                            $party_name = $me["partyname"];
+                                    ?>
+                                        <option value="<?php echo $party_id ?>"><?php echo $party_name ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <input type="number" id="score" name="score" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <div id="resp"></div>
+                            <button type="submit" class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">Save</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
             
@@ -88,28 +105,36 @@ include "config.php";
     </body>
     <script src="https://unpkg.com/flowbite@1.4.7/dist/flowbite.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-<script>
-$(document).ready(function () {
+    <script>
+        $(document).ready(function() {
+            // submit registeration
+            $("#addform").submit(function(e) {
+                e.preventDefault();
 
-	$("#lga").change(function() {
-	$("#resps").html("");
+                $("#resp").html("<div role='alert'> <div class='border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700'> <p>Verifying</p> </div> </div>");
+                var formData = new FormData(this);
 
-    // alert($("#lga").val());
+                $.ajax({
+                    url: 'add_result.php',
+                    type: 'POST',
+                    data: formData,
+                    success: function(data) {
+                        if (data == 'yes') {
+                            // window.location.href = "admins.php";
+                            $("#resp").html("<div role='alert'> <div class='border border-t-0 border-green-400 rounded-b bg-green-100 px-4 py-3 text-green-700'> <p>Score added</p> </div> </div>");
+                            $("#addform")[0].reset();
+                        } else {
+                            $("#resp").html(data).show("slow");
+                            // $("#resp").html(data);
+                        }
+                        // $("#aform")[0].reset();
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            });
 
-	var formData = {
-		lga: $("#lga").val(),
-	};
-	$.ajax({
-		type: "POST",
-		url: "checklga.php",
-		data: formData,
-	}).done(function(data) {
-        
-		$("#resps").html(data);
-
-	});
-	});
-
-});
-</script>
+        });
+    </script>
 </html>
