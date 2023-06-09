@@ -6,13 +6,13 @@ include "config.php";
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <script src="js/jquery.min.js"></script>  
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Bincom Test</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel="stylesheet" href="https://unpkg.com/flowbite@1.4.7/dist/flowbite.min.css" />
+        <script src="js/jquery.min.js"></script>
     </head>
     <body>
         <main>
@@ -75,78 +75,35 @@ include "config.php";
 
             <div class="p-4 sm:ml-64">
                 <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-                    <div class="w-full text-xl text-center pb-4">Polling Unit Results</div>
-                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3">
-                                        State
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        LGA
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        Polling Unit
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        Result
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $lga = "SELECT * FROM lga WHERE state_id = '25'";
-                                $r = $conn->query($lga);
-                                if ($r->num_rows > 0) {
-                                    while($me = $r->fetch_assoc()) {
-                                        $lga_id = $me["lga_id"];
-                                        $lga_name = $me["lga_name"];
-
-                                $polling_units = "SELECT * FROM polling_unit WHERE lga_id = '$lga_id'";
-                                    $result = $conn->query($polling_units);
-                                    if ($result->num_rows > 0) {
-                                        while($row = $result->fetch_assoc()) {
-                                            $name = $row["polling_unit_name"];
-                                            $polling_id = $row["uniqueid"];
-                                       
-                                ?>
-                                <tr class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Delta
-                                    </th>
-                                    <td class="px-6 py-4">
-                                        <?php echo $lga_name ?>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <?php echo $name ?>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <?php
-                                            $polling_units_result = "SELECT SUM(party_score) AS total_score FROM announced_pu_results WHERE polling_unit_uniqueid = '$polling_id'";
-                                            $res = $conn->query($polling_units_result);
-                                            if ($res->num_rows > 0) {
-                                                while($row = $res->fetch_assoc()) {
-                                                    $totalScore = $row['total_score'];
-                                                }
-                                                if(empty($totalScore)){
-                                                    echo "0";
-                                                }else{
-                                                echo $totalScore;
-                                                }
-                                            }
-                                        ?>
-                                        <!-- 2,200 -->
-                                    </td>
-                                </tr>
-                                <?php
-                                            }
+                    <div class="w-full text-xl text-center pb-4">
+                        Check Local Govt. Results
+                    </div>
+                    
+                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="lga" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Local Govt.</label>
+                                <select id="lga" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option>--- Select Local Govt ---</option>
+                                    <?php
+                                    $lga = "SELECT * FROM lga WHERE state_id = '25'";
+                                    $r = $conn->query($lga);
+                                    if ($r->num_rows > 0) {
+                                        while($me = $r->fetch_assoc()) {
+                                            $lga_id = $me["lga_id"];
+                                            $lga_name = $me["lga_name"];
+                                    ?>
+                                        <option value="<?php echo $lga_id ?>"><?php echo $lga_name ?></option>
+                                    <?php
                                         }
                                     }
-                                }
-                                ?>
-                            </tbody>
-                        </table>
+                                    ?>
+                                </select>
+                            </div>
+                            <a href="#" class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                                <div id="resps" class="font-normal text-gray-700 dark:text-gray-400"></div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -155,4 +112,26 @@ include "config.php";
     </body>
     <script src="https://unpkg.com/flowbite@1.4.7/dist/flowbite.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+<script>
+$(document).ready(function () {
+
+	$("#lga").change(function() {
+	$("#resps").html("");
+
+    // alert($("#lga").val());
+
+	var formData = {
+		lga: $("#lga").val(),
+	};
+	$.ajax({
+		type: "POST",
+		url: "checklga.php",
+		data: formData,
+	}).done(function(data) {
+		$("#resps").html(data);
+	});
+	});
+
+});
+</script>
 </html>
